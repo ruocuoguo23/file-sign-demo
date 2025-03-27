@@ -17,13 +17,15 @@ jobs:
     steps:
       - name: Request OIDC Token
         run: |
-          echo "Requesting OIDC Token..."
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL: $ACTIONS_ID_TOKEN_REQUEST_URL"
-          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN: $ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+          echo "Requesting OIDC Token..."  > oidc_token.txt
+          echo "ACTIONS_ID_TOKEN_REQUEST_URL: $ACTIONS_ID_TOKEN_REQUEST_URL"  >> oidc_token.txt
+          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN: $ACTIONS_ID_TOKEN_REQUEST_TOKEN"  >> oidc_token.txt
 
           TOKEN=$(curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
                        -H "Accept: application/json; api-version=2.0" \
                        "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq -r .value)
 
-          echo "OIDC Token:"
-          echo "$TOKEN"
+          # 将 Token 存入文件
+          echo "$TOKEN" >> oidc_token.txt
+          
+          cat oidc_token.txt
