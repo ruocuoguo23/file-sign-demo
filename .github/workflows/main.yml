@@ -1,0 +1,23 @@
+name: Generate OIDC Token
+
+on:
+  workflow_dispatch:  # 允许手动触发
+  push:
+    branches:
+      - main  # 仅在 main 分支推送时触发
+
+permissions:
+  id-token: write  # 允许 GitHub 生成 OIDC 令牌
+  contents: read   # 允许读取仓库内容（可选）
+
+jobs:
+  oidc-token:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Request OIDC Token
+        run: |
+          echo "Requesting OIDC Token..."
+          curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+               -H "Accept: application/json; api-version=2.0" \
+               "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq .
