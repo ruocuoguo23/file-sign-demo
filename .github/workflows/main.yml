@@ -18,6 +18,8 @@ jobs:
       - name: Request OIDC Token
         run: |
           echo "Requesting OIDC Token..."
-          curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-               -H "Accept: application/json; api-version=2.0" \
-               "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq .
+          TOKEN=$(curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+                       -H "Accept: application/json; api-version=2.0" \
+                       "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sigstore" | jq -r .value)
+          echo "OIDC Token (Base64 Encoded):"
+          echo "$TOKEN" | base64
