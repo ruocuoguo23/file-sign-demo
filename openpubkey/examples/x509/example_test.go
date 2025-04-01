@@ -17,36 +17,27 @@
 package main
 
 import (
-	"fmt"
+	"testing"
+
 	"github.com/openpubkey/openpubkey/providers"
+	"github.com/stretchr/testify/require"
 )
 
-func main() {
-	// set up GoogleOp with default options
-	opOptions := providers.GetDefaultGoogleOpOptions()
-	opOptions.GQSign = false
-	op := providers.NewGoogleOpWithOptions(opOptions)
-
-	// set up file paths
-	filePath := "test/example.txt"
-	pkRecordPath := "test/public_key_record.json"
-	sigPath := "test/signature.bin"
-	pktPath := "test/pkt.json"
-
-	// set up file signer
-	fs := NewFileSigner(op, pkRecordPath, sigPath, pktPath)
-
-	// sign
-	if err := fs.Sign(filePath); err != nil {
-		fmt.Println("Sign error:", err)
-		return
+func TestSimpleExample(t *testing.T) {
+	providerOpts := providers.MockProviderOpts{
+		Issuer:     "mockIssuer",
+		GQSign:     true,
+		NumKeys:    2,
+		CommitType: providers.CommitTypesEnum.AUD_CLAIM,
+		VerifierOpts: providers.ProviderVerifierOpts{
+			CommitType:        providers.CommitTypesEnum.AUD_CLAIM,
+			SkipClientIDCheck: true,
+			GQOnly:            true,
+		},
 	}
+	op, _, _, err := providers.NewMockProvider(providerOpts)
+	require.NoError(t, err)
 
-	// verify
-	if err := fs.Verify(filePath); err != nil {
-		fmt.Println("Verify error:", err)
-		return
-	}
-
-	fmt.Println("File signed and verified successfully!")
+	err = login(op)
+	require.NoError(t, err)
 }
